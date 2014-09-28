@@ -271,17 +271,34 @@ srcpos_string(struct srcpos *pos)
 	if (pos)
 		fname = pos->file->name;
 
+#ifdef __MINGW32__
+	pos_str = (char *)malloc(MAX_PATH);
+	if (pos_str == NULL)
+		die("Couldn't allocate in srcpos string");
+#endif
 
 	if (pos->first_line != pos->last_line)
+#ifdef __MINGW32__	
+		rc = snprintf(pos_str, MAX_PATH, "%s:%d.%d-%d.%d", fname,
+#else
 		rc = asprintf(&pos_str, "%s:%d.%d-%d.%d", fname,
+#endif
 			      pos->first_line, pos->first_column,
 			      pos->last_line, pos->last_column);
 	else if (pos->first_column != pos->last_column)
+#ifdef __MINGW32__	
+		rc = snprintf(pos_str, MAX_PATH, "%s:%d.%d-%d", fname,
+#else
 		rc = asprintf(&pos_str, "%s:%d.%d-%d", fname,
+#endif
 			      pos->first_line, pos->first_column,
 			      pos->last_column);
 	else
+#ifdef __MINGW32__	
+		rc = snprintf(pos_str, MAX_PATH, "%s:%d.%d", fname,
+#else
 		rc = asprintf(&pos_str, "%s:%d.%d", fname,
+#endif
 			      pos->first_line, pos->first_column);
 
 	if (rc == -1)

@@ -45,7 +45,11 @@ static struct node *read_fstree(const char *dirname)
 
 		tmpnam = join_path(dirname, de->d_name);
 
+#ifdef __MINGW32__
+		if (stat(tmpnam, &st) < 0)
+#else
 		if (lstat(tmpnam, &st) < 0)
+#endif
 			die("stat(%s): %s\n", tmpnam, strerror(errno));
 
 		if (S_ISREG(st.st_mode)) {
