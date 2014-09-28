@@ -274,7 +274,11 @@ void dt_to_source(FILE *f, struct boot_info *bi)
 
 		for_each_label(re->labels, l)
 			fprintf(f, "%s: ", l->label);
+#ifndef __MINGW32__
 		fprintf(f, "/memreserve/\t0x%016llx 0x%016llx;\n",
+#else
+		fprintf(f, "/memreserve/\t0x%016I64x 0x%016I64x;\n",
+#endif
 			(unsigned long long)re->re.address,
 			(unsigned long long)re->re.size);
 	}
