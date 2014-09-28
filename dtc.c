@@ -21,6 +21,11 @@
 #include "dtc.h"
 #include "srcpos.h"
 
+#ifdef __MINGW32__
+#include <stdlib.h>
+#include <fcntl.h>
+#endif
+
 /*
  * Command line options
  */
@@ -115,6 +120,10 @@ int main(int argc, char *argv[])
 	FILE *outf = NULL;
 	int outversion = DEFAULT_FDT_VERSION;
 	long long cmdline_boot_cpuid = -1;
+
+#ifdef __MINGW32__
+	_fmode = _O_BINARY;
+#endif
 
 	quiet      = 0;
 	reservenum = 0;
