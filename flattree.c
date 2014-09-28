@@ -184,7 +184,11 @@ static void asm_emit_data(void *e, struct data d)
 	}
 
 	while ((d.len - off) >= 1) {
+#ifndef __MINGW32__
 		fprintf(f, "\t.byte\t0x%hhx\n", d.val[off]);
+#else
+		fprintf(f, "\t.byte\t0x%-2x\n", (unsigned char)(d.val[off]));
+#endif
 		off += 1;
 	}
 

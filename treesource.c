@@ -122,7 +122,11 @@ static void write_propval_string(FILE *f, struct data val)
 			if (isprint(c))
 				fprintf(f, "%c", c);
 			else
+#ifndef __MINGW32__
 				fprintf(f, "\\x%02hhx", c);
+#else
+				fprintf(f, "\\x%02x", (unsigned char)c);
+#endif
 		}
 	}
 	fprintf(f, "\"");
@@ -178,7 +182,11 @@ static void write_propval_bytes(FILE *f, struct data val)
 			m = m->next;
 		}
 
+#ifndef __MINGW32__
 		fprintf(f, "%02hhx", *bp++);
+#else
+		fprintf(f, "%02x", (unsigned char)(*bp++));
+#endif
 		if ((const void *)bp >= propend)
 			break;
 		fprintf(f, " ");
