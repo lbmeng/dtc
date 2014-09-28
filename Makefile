@@ -18,7 +18,7 @@ CONFIG_LOCALVERSION =
 CPPFLAGS = -I libfdt -I .
 WARNINGS = -Werror -Wall -Wpointer-arith -Wcast-qual -Wnested-externs \
 	-Wstrict-prototypes -Wmissing-prototypes -Wredundant-decls
-CFLAGS = -g -Os -fPIC -Werror $(WARNINGS)
+CFLAGS = -g -Os -Werror $(WARNINGS)
 
 BISON = bison
 LEX = flex
@@ -206,6 +206,12 @@ include tests/Makefile.tests
 #
 STD_CLEANFILES = *~ *.o *.$(SHAREDLIB_EXT) *.d *.a *.i *.s core a.out vgcore.* \
 	*.tab.[ch] *.lex.c *.output
+ifeq ($(findstring mingw32_nt, $(HOSTOS)),)
+CFLAGS += -fPIC
+else
+BIN_WIN := $(addsuffix .exe, $(BIN))
+BIN = $(BIN_WIN)
+endif
 
 clean: libfdt_clean tests_clean
 	@$(VECHO) CLEAN
