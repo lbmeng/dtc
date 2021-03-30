@@ -157,18 +157,26 @@ int fdt_generate_phandle(const void *fdt, uint32_t *phandle)
 	return 0;
 }
 
-static const struct fdt_reserve_entry *fdt_mem_rsv(const void *fdt, int n)
+static bool fdt_is_mem_rsv(const void *fdt, int n)
 {
 	unsigned int offset = n * sizeof(struct fdt_reserve_entry);
 	unsigned int absoffset = fdt_off_mem_rsvmap(fdt) + offset;
 
 	if (!can_assume(VALID_INPUT)) {
 		if (absoffset < fdt_off_mem_rsvmap(fdt))
-			return NULL;
+			return false;
 		if (absoffset > fdt_totalsize(fdt) -
 		    sizeof(struct fdt_reserve_entry))
-			return NULL;
+			return false;
 	}
+
+	return true;
+}
+
+static const struct fdt_reserve_entry *fdt_mem_rsv(const void *fdt, int n)
+{
+	if (!fdt_is_mem_rsv(fdt, n))
+		return NULL;
 	return fdt_mem_rsv_(fdt, n);
 }
 
@@ -191,7 +199,8 @@ int fdt_num_mem_rsv(const void *fdt)
 	int i;
 	const struct fdt_reserve_entry *re;
 
-	for (i = 0; (re = fdt_mem_rsv(fdt, i)) != NULL; i++) {
+	for (i = 0; fdt_is_mem_rsv(fdt, i); i++) {
+		re = fdt_mem_rsv_(fdt, i);
 		if (fdt64_ld_(&re->size) == 0)
 			return i;
 	}
